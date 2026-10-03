@@ -20,8 +20,16 @@ func main() {
 	svc := service.NewItemService(repo)
 	h := handler.NewItemHandler(svc)
 
+	configRepo := repository.NewConfigRepo("data/pomodoro.json")
+	configSvc := service.NewConfigService(configRepo)
+	configHandler := handler.NewConfigHandler(configSvc)
+	timerSvc := service.NewTimerService(configSvc)
+	timerHandler := handler.NewTimerHandler(timerSvc)
+
 	mux := http.NewServeMux()
 	h.Register(mux)
+	configHandler.Register(mux)
+	timerHandler.Register(mux)
 
 	srv := &http.Server{Addr: ":8080", Handler: mux}
 	go func() {
